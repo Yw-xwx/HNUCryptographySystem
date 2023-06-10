@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>safe.jpg</file>
+        <file>hello.jpg</file>
+    </qresource>
+</RCC>
