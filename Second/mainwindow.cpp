@@ -297,8 +297,24 @@ Widget_des::Widget_des(QWidget* parent):Widget_base(parent)
     {
         std::string key = text_key->text().toStdString();
         std::string plainText = text_plain->text().toStdString();
+        double len = plainText.size();
         Des temp;
-        QString cipher = QString::fromStdString(temp.encryption(plainText,key));
+        QString cipher = "";
+        string temp_plain = "";
+        for(int i = 0;i<len;i+=16)
+        {
+            int gap = 16-(len-i);
+            while(gap > 0)
+            {
+                if((16-len+i) <10)
+                    plainText += '0'+(16-len+i);
+                else
+                    plainText += 'A'+(6-len+i);
+                gap--;
+            }
+            temp_plain = plainText.substr(i,16);
+            cipher += QString::fromStdString(temp.encryption(temp_plain,key));
+        }
         text_cipher->setText(cipher);
         QMessageBox::information(this,"成功!",QString("加密完成,密文是:%1").arg(text_cipher->text()));
     });
@@ -306,8 +322,15 @@ Widget_des::Widget_des(QWidget* parent):Widget_base(parent)
     {
         std::string key = text_key->text().toStdString();
         std::string cipherText = text_cipher->text().toStdString();
+        double len = cipherText.size();
         Des temp;
-        QString plain = QString::fromStdString(temp.decryption(cipherText,key));
+        QString plain = "";
+        string temp_cipher = "";
+        for(int i = 0;i<len;i+=16)
+        {
+            temp_cipher = cipherText.substr(i,16);
+            plain += QString::fromStdString(temp.decryption(temp_cipher,key));
+        }
         text_plain->setText(plain);
         QMessageBox::information(this,"成功!",QString("解密完成,明文是:%1").arg(text_plain->text()));
     });
@@ -320,7 +343,7 @@ Widget_rsa::Widget_rsa(QWidget *parent):Widget_base(parent)
     btn_key2->setText("素数q");
     text_key2->setPlaceholderText("输入素数q");
     text_e->setPlaceholderText("注意e要和φ(n)互素");
-    text_fai->setPlaceholderText("φ(n)=(p-1)(q-1)");
+    text_fai->setPlaceholderText("输入n");
     layout_rsa->addWidget(btn_e);
     layout_rsa->addWidget(text_e);
     layout_rsa->addWidget(btn_fai);
@@ -350,7 +373,7 @@ Widget_rsa::Widget_rsa(QWidget *parent):Widget_base(parent)
         {
             r->fai = (r->p-1)*(r->q-1);
             r->e = text_e->text().toInt();
-            text_fai->setText(QString::number(r->fai));
+            text_fai->setText(QString::number(r->p*r->q));
             if(r->gcd(r->e,r->fai) != 1)
                 QMessageBox::warning(this,"错误!","你选择的e和φ(n)并不互素,请重新选择e");
             else
@@ -359,7 +382,7 @@ Widget_rsa::Widget_rsa(QWidget *parent):Widget_base(parent)
                 if(reply == QMessageBox::Yes)
                 {
                     r->d = r->eula(r->e,r->fai);
-                    QMessageBox::information(this,"成功!", QString("公钥对是:(%1,%2)\n私钥对是:(%3,%2)").arg(r->e).arg(r->fai).arg(r->d));
+                    QMessageBox::information(this,"成功!", QString("公钥对是:(%1,%2)\n私钥对是:(%3,%2)").arg(r->e).arg(r->p*r->q).arg(r->d));
                 }
             }
         }
@@ -368,12 +391,16 @@ Widget_rsa::Widget_rsa(QWidget *parent):Widget_base(parent)
     });
     connect(btn_encryption,&QPushButton::clicked,this,[=]()
     {
-        text_cipher->setText(r->solve(text_plain->text(),r->e,r->p*r->q));
+        int key_n = text_fai->text().toInt();
+        int public_key = text_e->text().toInt();
+        text_cipher->setText(r->solve(text_plain->text(),public_key,key_n));
         QMessageBox::information(this,"成功!",QString("加密完成,密文是:%1").arg(text_cipher->text()));
     });
     connect(btn_decryption,&QPushButton::clicked,this,[=]()
     {
-        text_plain->setText(r->solve(text_cipher->text(),r->d,r->p*r->q));
+        int key_n = text_fai->text().toInt();
+        int secret_key = text_e->text().toInt();
+        text_plain->setText(r->solve(text_cipher->text(),secret_key,key_n));
         QMessageBox::information(this,"成功!",QString("解密完成,明文是:%1").arg(text_plain->text()));
     });
 }

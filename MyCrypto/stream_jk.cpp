@@ -6,7 +6,7 @@ QString encrypt(const QString& plaintext, LFSR<size1>& lfsr1, LFSR<size2>& lfsr2
 {
     QString ciphertext = "";
     for (QChar c : plaintext) {
-        std::bitset<8> plaintextByte(c.toLatin1());
+        std::bitset<8> plaintextByte(c.toLatin1());//每个字符转成二进制的八比特序列
         std::bitset<8> cipherByte;
         for (int i = 0; i < 8; ++i) {
             bool keybit = jk.jk_output(lfsr1.lfsr_output(), lfsr2.lfsr_output());

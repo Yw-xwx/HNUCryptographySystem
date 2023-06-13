@@ -62,8 +62,8 @@ public:
     QPushButton *btn_back = new QPushButton("返回",this);
     QPushButton *btn_encryption = new QPushButton("加密",this);
     QPushButton *btn_decryption = new QPushButton("解密",this);
-    QPushButton *btn_e = new QPushButton("选择e",this);
-    QPushButton *btn_fai = new QPushButton("φ(n)",this);
+    QPushButton *btn_e = new QPushButton("输入e/d",this);
+    QPushButton *btn_fai = new QPushButton("n",this);
     QPushButton *btn_judge_gcd = new QPushButton("计算φ(n)并判断\ne是否与之互素",this);
     QLineEdit *text_key = new QLineEdit("",this);
     QLineEdit *text_key2 = new QLineEdit("",this);
